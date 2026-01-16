@@ -50,7 +50,7 @@ export default function DateTimePicker({ barberId, serviceDuration, onSelect, se
                     .from('perfiles')
                     .select('id')
                     .eq('rol', 'barbero')
-                if (allBarbers) targetBarberIds = allBarbers.map(b => b.id)
+                if (allBarbers) targetBarberIds = (allBarbers as any).map((b: any) => b.id)
             } else {
                 targetBarberIds = [barberId]
             }
@@ -78,21 +78,26 @@ export default function DateTimePicker({ barberId, serviceDuration, onSelect, se
             }
 
             // 3. Obtener Citas existentes
-            const startOfDayStr = `${date}T00:00:00`
-            const endOfDayStr = `${date}T23:59:59`
+            // Buscamos citas en el rango del día seleccionado (Local Time -> UTC)
+            // Aseguramos cubrir todo el día local convirtiendo a ISOString
+            const startOfDayDate = new Date(`${date}T00:00:00`)
+            const endOfDayDate = new Date(`${date}T23:59:59.999`)
+
+            const startOfDayISO = startOfDayDate.toISOString()
+            const endOfDayISO = endOfDayDate.toISOString()
 
             const { data: appointmentsData } = await supabase
                 .from('citas')
                 .select('fecha_hora, servicio_id, barbero_id, servicios(duracion_minutos)')
                 .in('barbero_id', targetBarberIds)
-                .gte('fecha_hora', startOfDayStr)
-                .lte('fecha_hora', endOfDayStr)
+                .gte('fecha_hora', startOfDayISO)
+                .lte('fecha_hora', endOfDayISO)
                 .neq('estado', 'cancelada')
 
             const appointments = (appointmentsData || []) as unknown as Appointment[]
 
             // 4. Generar Slots Combinados
-            const allPossibleSlots = new Set<number>()
+            const slotStatus = new Map<number, boolean>()
 
             schedules.forEach(schedule => {
                 const [startHour, startMinute] = schedule.hora_inicio.split(':').map(Number)
@@ -131,20 +136,22 @@ export default function DateTimePicker({ barberId, serviceDuration, onSelect, se
                         }
                     }
 
-                    if (!isBooked) {
-                        allPossibleSlots.add(currentSlotStart.getTime())
-                    }
+                    const timeKey = currentSlotStart.getTime()
+                    const currentStatus = slotStatus.get(timeKey) || false
+                    // Si ya estaba disponible (por otro barbero), se mantiene disponible.
+                    // Si no, tomamos el estado actual (!isBooked).
+                    slotStatus.set(timeKey, currentStatus || !isBooked)
 
                     currentSlotStart = addMinutes(currentSlotStart, 30)
                 }
             })
 
-            const sortedSlots: TimeSlot[] = Array.from(allPossibleSlots)
-                .sort((a, b) => a - b)
-                .map(time => ({
+            const sortedSlots: TimeSlot[] = Array.from(slotStatus.entries())
+                .sort(([a], [b]) => a - b)
+                .map(([time, available]) => ({
                     start: new Date(time),
                     end: addMinutes(new Date(time), serviceDuration),
-                    available: true
+                    available: available
                 }))
 
             setSlots(sortedSlots)
@@ -186,7 +193,7 @@ export default function DateTimePicker({ barberId, serviceDuration, onSelect, se
                             onClick={() => onSelect(slot.start)}
                             className={cn(
                                 "py-3 px-2 rounded-xl text-sm font-bold transition-all shadow-sm",
-                                !slot.available && "opacity-40 cursor-not-allowed bg-zinc-100 text-zinc-400 border border-zinc-200",
+                                !slot.available && "cursor-not-allowed bg-red-100 text-red-600 border border-red-200 opacity-60",
                                 slot.available && selectedDate?.getTime() === slot.start.getTime()
                                     ? "bg-navy-900 text-white shadow-lg scale-105"
                                     : slot.available && "bg-white text-navy-900 border border-zinc-200 hover:border-navy-900 hover:bg-navy-50"

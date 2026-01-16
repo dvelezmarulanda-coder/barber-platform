@@ -54,16 +54,20 @@ export default function BookingWizard() {
 
         let finalBarberId = selectedBarber.id
 
-        // LOGICA DE ASIGNACION AUTOMATICA
-        if (finalBarberId === 'any') {
-            try {
+
+        // LOGICA DE ASIGNACION AUTOMATICA O VALIDACION DE DISPONIBILIDAD
+        try {
+            if (finalBarberId === 'any') {
+                // ... (existing logic for 'any' remains the same, just wrapped in try/catch if not already)
                 // 1. Encontrar quién trabaja este día
                 const dayOfWeek = selectedDate.getDay()
-                const { data: schedules } = await supabase
+                const { data: schedulesData } = await supabase
                     .from('horarios_disponibilidad')
                     .select('barbero_id, hora_inicio, hora_fin')
                     .eq('dia_semana', dayOfWeek)
                     .eq('activo', true)
+
+                const schedules = schedulesData as any[]
 
                 if (!schedules || schedules.length === 0) throw new Error('No hay barberos trabajando este día.')
 
@@ -95,11 +99,27 @@ export default function BookingWizard() {
                 // 4. Asignar aleatoriamente
                 finalBarberId = availableBarbers[Math.floor(Math.random() * availableBarbers.length)]
 
-            } catch (error: any) {
-                alert('Error de disponibilidad: ' + error.message)
-                setLoading(false)
-                return
+            } else {
+                // VALIDACION DE DISPONIBILIDAD PARA BARBERO ESPECIFICO
+                const conflictStart = selectedDate.toISOString()
+                const conflictEnd = addMinutes(selectedDate, selectedService.duracion_minutos).toISOString()
+
+                const { data: conflicts } = await supabase
+                    .from('citas')
+                    .select('id')
+                    .eq('barbero_id', finalBarberId)
+                    .gte('fecha_hora', conflictStart)
+                    .lt('fecha_hora', conflictEnd)
+                    .neq('estado', 'cancelada')
+
+                if (conflicts && conflicts.length > 0) {
+                    throw new Error('Lo sentimos, este horario ya ha sido reservado por otra persona.')
+                }
             }
+        } catch (error: any) {
+            alert(error.message)
+            setLoading(false)
+            return
         }
 
         const appointmentData: any = {
