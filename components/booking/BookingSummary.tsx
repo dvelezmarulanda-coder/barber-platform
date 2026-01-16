@@ -43,8 +43,7 @@ export default function BookingSummary({ service, barber, date, onConfirm, loadi
             <button
                 onClick={onConfirm}
                 disabled={loading}
-                style={{ backgroundColor: '#ffffff', color: '#000000' }}
-                className="w-full py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                className="w-full py-4 rounded-full bg-navy-900 text-white font-bold text-lg hover:bg-navy-800 transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {loading ? 'Confirmando...' : 'Confirmar Reserva'}
             </button>
