@@ -49,10 +49,15 @@ export default function AppointmentCard({ appointment, role }: AppointmentCardPr
         ? appointment.perfiles_barbero
         : appointment.perfiles_cliente
 
-    // If admin, show both names or client name
+    // If admin, show both names or client name (including guest names)
+    const clientName = appointment.cliente_nombre || appointment.perfiles_cliente?.nombre || 'Cliente'
+    const barberName = appointment.perfiles_barbero?.nombre || 'Barbero'
+
     const displayPerson = role === 'admin'
-        ? `${appointment.perfiles_cliente?.nombre || 'Cliente'} con ${appointment.perfiles_barbero?.nombre || 'Barbero'}`
-        : otherPerson?.nombre || 'Desconocido'
+        ? `${clientName} con ${barberName}`
+        : role === 'cliente'
+            ? barberName
+            : clientName
 
     return (
         <div className="bg-white border border-zinc-100 rounded-[1.5rem] p-6 shadow-sm hover:shadow-lg hover:border-navy-900/10 transition-all duration-300 group">
@@ -93,6 +98,21 @@ export default function AppointmentCard({ appointment, role }: AppointmentCardPr
                         <span className="text-navy-900 font-bold text-base">{displayPerson}</span>
                     </span>
                 </div>
+
+                {/* Phone Number - Show for barbers/admins viewing client appointments */}
+                {(role === 'barbero' || role === 'admin') && (
+                    <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-400">📞</span>
+                        <span>
+                            <span className="text-xs uppercase font-bold text-zinc-400 block mb-0.5">
+                                Teléfono
+                            </span>
+                            <span className="text-navy-900 font-bold text-base">
+                                {appointment.cliente_telefono || appointment.perfiles_cliente?.telefono || 'No registrado'}
+                            </span>
+                        </span>
+                    </div>
+                )}
 
                 <div className="flex items-center gap-3">
                     <span className="w-8 h-8 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-400">💰</span>
