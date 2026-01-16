@@ -168,6 +168,14 @@ export default function DashboardPage() {
                                     <span>📱</span> QR
                                 </Link>
                             )}
+
+                            {/* New Settings Button (For everyone) */}
+                            <Link
+                                href="/settings"
+                                className="bg-white text-zinc-600 border border-zinc-200 px-6 py-3.5 rounded-xl font-bold text-base transition-all duration-300 hover:bg-zinc-50 flex items-center gap-2"
+                            >
+                                <span>🔑</span> Clave
+                            </Link>
                         </div>
                     </div>
                 </div>
