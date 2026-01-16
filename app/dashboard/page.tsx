@@ -74,6 +74,22 @@ export default function DashboardPage() {
         router.refresh()
     }
 
+    const handleMarkAsCompleted = async (citaId: string) => {
+        if (!confirm('¿Marcar esta cita como completada?')) return
+
+        const { error } = await supabase
+            .from('citas')
+            .update({ estado: 'completada' })
+            .eq('id', citaId)
+
+        if (error) {
+            alert('Error al actualizar: ' + error.message)
+        } else {
+            alert('✅ Cita marcada como completada')
+            router.refresh()
+        }
+    }
+
     const groupAppointmentsByDate = () => {
         const now = new Date()
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -184,6 +200,8 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </div>
+
+
 
                 {/* Success Message */}
                 {isSuccess && (

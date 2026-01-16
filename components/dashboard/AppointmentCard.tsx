@@ -38,6 +38,24 @@ export default function AppointmentCard({ appointment, role }: AppointmentCardPr
             router.refresh()
         }
     }
+
+    const handleMarkAsCompleted = async () => {
+        if (!confirm('¿Marcar esta cita como completada?')) return
+
+        setLoading(true)
+        const { error } = await supabase
+            .from('citas')
+            .update({ estado: 'completada' })
+            .eq('id', appointment.id)
+
+        if (error) {
+            alert('Error al actualizar: ' + error.message)
+            setLoading(false)
+        } else {
+            router.refresh()
+        }
+    }
+
     const statusColors = {
         pendiente: 'bg-amber-100 text-amber-700 border-amber-200',
         confirmada: 'bg-green-100 text-green-700 border-green-200',
@@ -65,7 +83,7 @@ export default function AppointmentCard({ appointment, role }: AppointmentCardPr
                 <div>
                     <span className={cn(
                         "text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-widest",
-                        statusColors[appointment.estado]
+                        statusColors[appointment.estado as keyof typeof statusColors] || 'bg-gray-100 text-gray-500'
                     )}>
                         {appointment.estado}
                     </span>
@@ -120,9 +138,21 @@ export default function AppointmentCard({ appointment, role }: AppointmentCardPr
                 </div>
             </div>
 
-            {/* Cancel Button */}
+            {/* Action Buttons */}
             {(appointment.estado === 'pendiente' || appointment.estado === 'confirmada') && (
-                <div className="mt-6 pt-4 border-t border-zinc-50">
+                <div className="mt-6 pt-4 border-t border-zinc-50 space-y-2">
+                    {/* Mark as Completed Button - Only for barbers and admins */}
+                    {(role === 'barbero' || role === 'admin') && (
+                        <button
+                            onClick={handleMarkAsCompleted}
+                            disabled={loading}
+                            className="w-full text-center text-sm bg-green-600 hover:bg-green-700 text-white font-bold transition-colors py-3 rounded-xl disabled:opacity-50"
+                        >
+                            {loading ? '⏳ Procesando...' : '✓ Marcar como Listo'}
+                        </button>
+                    )}
+
+                    {/* Cancel Button */}
                     <button
                         onClick={handleCancel}
                         disabled={loading}
