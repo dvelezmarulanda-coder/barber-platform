@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Database } from '@/lib/database.types'
 import { cn } from '@/lib/utils'
+import BarberStats from '@/components/admin/BarberStats'
 
 type Profile = Database['public']['Tables']['perfiles']['Row']
 type Schedule = {
@@ -235,6 +236,9 @@ export default function AdminBarbersPage() {
                                     Eliminar rol
                                 </button>
                             </div>
+
+                            {/* Service Statistics */}
+                            <BarberStats barberId={selectedBarber.id} />
 
                             <div className="p-8 space-y-4">
                                 {schedules.map((schedule, index) => (
