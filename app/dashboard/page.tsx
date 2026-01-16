@@ -27,37 +27,42 @@ export default function DashboardPage() {
                 return
             }
 
-            const { data: profile } = await supabase
-                .from('perfiles')
-                .select('*')
-                .eq('id', user.id)
-                .single()
+            try {
+                const { data: profile } = await supabase
+                    .from('perfiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single()
 
-            setProfile(profile)
+                setProfile(profile)
 
-            if (profile) {
-                let query = supabase
-                    .from('citas')
-                    .select(`
-                        *,
-                        servicios(*),
-                        perfiles_barbero:perfiles!citas_barbero_id_fkey(*),
-                        perfiles_cliente:perfiles!citas_cliente_id_fkey(*)
-                    `)
-                    .order('fecha_hora', { ascending: true })
+                if (profile) {
+                    let query = supabase
+                        .from('citas')
+                        .select(`
+                            *,
+                            servicios(*),
+                            perfiles_barbero:perfiles!citas_barbero_id_fkey(*),
+                            perfiles_cliente:perfiles!citas_cliente_id_fkey(*)
+                        `)
+                        .order('fecha_hora', { ascending: true })
 
-                if (profile.rol === 'barbero') {
-                    query = query.eq('barbero_id', user.id)
-                } else if (profile.rol === 'cliente') {
-                    query = query.eq('cliente_id', user.id)
+                    if (profile.rol === 'barbero') {
+                        query = query.eq('barbero_id', user.id)
+                    } else if (profile.rol === 'cliente') {
+                        query = query.eq('cliente_id', user.id)
+                    }
+                    // Admin sees all appointments
+
+                    const { data, error } = await query
+                    if (data) setAppointments(data)
+                    if (error) console.error('Error fetching appointments:', error)
                 }
-                // Admin sees all appointments
-
-                const { data, error } = await query
-                if (data) setAppointments(data)
-                if (error) console.error(error)
+            } catch (error) {
+                console.error('Error in checkUser:', error)
+            } finally {
+                setLoading(false)
             }
-            setLoading(false)
         }
 
         checkUser()
