@@ -37,6 +37,11 @@ export default function DashboardPage() {
                 setProfile(profile)
 
                 if (profile) {
+                    // Calculate cutoff date (7 days ago)
+                    const sevenDaysAgo = new Date()
+                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+                    sevenDaysAgo.setHours(0, 0, 0, 0)
+
                     let query = supabase
                         .from('citas')
                         .select(`
@@ -55,7 +60,20 @@ export default function DashboardPage() {
                     // Admin sees all appointments
 
                     const { data, error } = await query
-                    if (data) setAppointments(data)
+
+                    if (data) {
+                        // Filter out old completed/cancelled appointments
+                        const filteredData = data.filter((apt: any) => {
+                            const aptDate = new Date(apt.fecha_hora)
+                            const isActive = apt.estado === 'pendiente' || apt.estado === 'confirmada'
+                            const isRecent = aptDate >= sevenDaysAgo
+
+                            // Show if: active OR recent (within last 7 days)
+                            return isActive || isRecent
+                        })
+
+                        setAppointments(filteredData)
+                    }
                     if (error) console.error('Error fetching appointments:', error)
                 }
             } catch (error) {
