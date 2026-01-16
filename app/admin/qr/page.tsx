@@ -18,26 +18,31 @@ export default function QRCodePage() {
 
     useEffect(() => {
         const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) {
-                router.push('/login')
-                return
-            }
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (!user) {
+                    router.push('/login')
+                    return
+                }
 
-            const { data: profile } = await supabase
-                .from('perfiles')
-                .select('*')
-                .eq('id', user.id)
-                .single()
+                const { data: profile } = await supabase
+                    .from('perfiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single()
 
-            setProfile(profile)
+                setProfile(profile)
 
-            if (profile && profile.rol !== 'admin' && profile.rol !== 'barbero') {
+                if (profile && profile.rol !== 'admin' && profile.rol !== 'barbero') {
+                    router.push('/dashboard')
+                    return
+                }
+            } catch (error) {
+                console.error('Error loading QR page:', error)
                 router.push('/dashboard')
-                return
+            } finally {
+                setLoading(false)
             }
-
-            setLoading(false)
         }
 
         checkUser()
