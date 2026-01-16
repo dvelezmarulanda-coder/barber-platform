@@ -127,8 +127,8 @@ export default function AdminBarbersPage() {
         const { data: users, error } = await supabase
             .from('perfiles')
             .select('*')
-            .eq('email', emailToPromote)
-            .single()
+            .ilike('email', emailToPromote.trim())
+            .maybeSingle()
 
         if (error || !users) {
             setMessage('❌ Usuario no encontrado.')
