@@ -233,16 +233,20 @@ export default function AdminAppointmentsPage() {
                                 </div>
                             </div>
 
-                            {/* BOTÓN AQUÍ */}
-                            <div className="mt-4 pt-4 border-t border-zinc-100">
-                                <button
-                                    onClick={() => handleMarkAsCompleted(cita.id)}
-                                    className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium text-sm transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <span>✓</span>
-                                    Marcar como Listo
-                                </button>
-                            </div>
+
+                            {/* BOTÓN AQUÍ - Solo mostrar si NO está cancelada o completada */}
+                            {(cita.estado === 'pendiente' || cita.estado === 'confirmada') && (
+                                <div className="mt-4 pt-4 border-t border-zinc-100">
+                                    <button
+                                        onClick={() => handleMarkAsCompleted(cita.id)}
+                                        disabled={updatingId === cita.id}
+                                        className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        <span>✓</span>
+                                        {updatingId === cita.id ? 'Procesando...' : 'Marcar como Listo'}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
