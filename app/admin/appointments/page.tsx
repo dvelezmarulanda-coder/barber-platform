@@ -32,11 +32,6 @@ export default function AdminAppointmentsPage() {
             const endOfDay = new Date(selectedDate)
             endOfDay.setHours(23, 59, 59, 999)
 
-            console.log('Fetching appointments for date range:', {
-                start: startOfDay.toISOString(),
-                end: endOfDay.toISOString()
-            })
-
             const { data, error } = await supabase
                 .from('citas')
                 .select(`
@@ -56,8 +51,6 @@ export default function AdminAppointmentsPage() {
             }
 
             setError(null)
-
-            console.log('Fetched appointments:', data)
 
             if (data) {
                 // Type assertion because Supabase types with joins are tricky
