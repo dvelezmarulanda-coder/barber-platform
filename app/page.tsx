@@ -24,11 +24,29 @@ function AuthRedirector() {
     return null
 }
 
+function SuccessMessage() {
+    const searchParams = useSearchParams()
+    const isSuccess = searchParams.get('booking') === 'success'
+
+    if (!isSuccess) return null
+
+    return (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-white text-navy-900 border border-green-200 rounded-2xl px-8 py-4 flex items-center gap-4 shadow-xl animate-in fade-in slide-in-from-top-4">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-xl text-green-700">🎉</div>
+            <div className="text-left">
+                <p className="font-bold text-lg leading-tight">¡Cita Agendada!</p>
+                <p className="text-zinc-500 text-sm">Tu reserva se ha realizado correctamente.</p>
+            </div>
+        </div>
+    )
+}
+
 export default function Home() {
     return (
         <main className="min-h-screen bg-[#F2F2F2] text-navy-900 font-outfit relative overflow-hidden">
             <Suspense fallback={null}>
                 <AuthRedirector />
+                <SuccessMessage />
             </Suspense>
 
             {/* Header Flotante Distribuido */}

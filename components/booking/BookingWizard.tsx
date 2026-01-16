@@ -123,7 +123,11 @@ export default function BookingWizard() {
             alert('Error al crear la cita: ' + error.message)
             setLoading(false)
         } else {
-            router.push('/dashboard?booking=success')
+            if (user) {
+                router.push('/dashboard?booking=success')
+            } else {
+                router.push('/?booking=success')
+            }
         }
     }
 
