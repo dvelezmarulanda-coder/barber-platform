@@ -20,7 +20,7 @@ export default function GuestForm({ onChange, defaultValues }: GuestFormProps) {
                         required
                         value={defaultValues.nombre}
                         onChange={(e) => onChange({ ...defaultValues, nombre: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-white focus:border-white outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-white focus:border-white outline-none placeholder:text-zinc-500"
                         placeholder="Ej. Juan Pérez"
                     />
                 </div>
@@ -32,7 +32,7 @@ export default function GuestForm({ onChange, defaultValues }: GuestFormProps) {
                         required
                         value={defaultValues.telefono}
                         onChange={(e) => onChange({ ...defaultValues, telefono: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-white focus:border-white outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-white focus:border-white outline-none placeholder:text-zinc-500"
                         placeholder="Ej. 300 123 4567"
                     />
                 </div>
@@ -43,7 +43,7 @@ export default function GuestForm({ onChange, defaultValues }: GuestFormProps) {
                         type="email"
                         value={defaultValues.email}
                         onChange={(e) => onChange({ ...defaultValues, email: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-white focus:border-white outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-white focus:border-white outline-none placeholder:text-zinc-500"
                         placeholder="Ej. juan@ejemplo.com"
                     />
                     <p className="text-xs text-zinc-500 mt-1">Te enviaremos el recordatorio a este correo.</p>
