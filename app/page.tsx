@@ -59,13 +59,21 @@ export default function Home() {
                 </div>
 
                 {/* Botón de Acceso Rápido */}
-                <Link
-                    href="/login"
-                    className="pointer-events-auto flex items-center gap-2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-white/50 text-navy-900 font-bold text-sm hover:bg-navy-900 hover:text-white transition-all hover:scale-105 animate-in fade-in slide-in-from-top-4 duration-1000 delay-100"
-                >
-                    <span>🔐</span>
-                    <span>Ingresar</span>
-                </Link>
+                <div className="pointer-events-auto flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-1000 delay-100">
+                    <Link
+                        href="/mis-citas"
+                        className="text-navy-900 font-bold text-sm bg-white/80 backdrop-blur-md px-5 py-3 rounded-full shadow-lg border border-white/50 hover:bg-white transition-all hover:scale-105"
+                    >
+                        Mis Citas
+                    </Link>
+                    <Link
+                        href="/login"
+                        className="flex items-center gap-2 bg-navy-900 px-6 py-3 rounded-full shadow-xl text-white font-bold text-sm hover:bg-navy-800 transition-all hover:scale-105"
+                    >
+                        <span>🔐</span>
+                        <span>Ingresar</span>
+                    </Link>
+                </div>
 
             </header>
 
